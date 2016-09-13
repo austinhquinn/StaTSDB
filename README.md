@@ -13,3 +13,5 @@ docker build -t aquinn/statsdb:0.7 -f ./DockerFile .
 Then use the Zenoss Command Center webui to add the application template 'statsdb.json', then add a new application using the statsdb template.
 You may have to change some of the settings but this initial commit will get you 90+% to a working statsd ingest into opentsdb for zenoss.
 
+# TESTING
+echo "gorets._t_foo.bar:261|c" | nc -w 1 -u localhost 8125

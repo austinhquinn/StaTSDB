@@ -1,0 +1,96 @@
+# Docker file to create a CentOS StatsD host.
+# with OpenTSDB backend
+FROM centos:centos6
+
+# Install things as root
+USER root
+
+RUN \
+  yum update -y --quiet && \
+  yum install -y --quiet wget && \
+  yum install -y --quiet tar && \
+  yum install -y --quiet unzip && \
+  yum install -y --quiet which && \
+  yum install -y --quiet git && \
+  yum install -y --quiet nc
+
+# Add an statsd user that StatsD will actually run as.
+RUN useradd statsd -c 'StatsD User' -d /home/statsd
+
+# Set up /local for the ES binaries and data.
+RUN \
+  mkdir -p /local/node && \
+  mkdir -p /local/statsd && \
+  chown statsd:statsd /local/statsd && \
+  mkdir -p /local/data && \
+  chown statsd:statsd /local/data
+
+# Set some ENV variables to cut down on the typos.
+ENV NODE_HOME /local/node
+ENV NODE_VERSION 0.10.32
+ENV PATH $NODE_HOME/bin:$PATH
+
+ENV STATSD_HOME /local/statsd
+ENV PATH $STATSD_HOME:$PATH
+ENV STATSD_CONF /local/statsd/statsdConfig.js
+ENV STATSD_VERSION 1.3.4
+
+# Download and install Node
+RUN \
+  cd /tmp && \
+  wget --quiet http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz && \
+  tar xfz node-v$NODE_VERSION-linux-x64.tar.gz && \
+  rm node-v$NODE_VERSION-linux-x64.tar.gz && \
+  mv /tmp/node-v$NODE_VERSION-linux-x64/* $NODE_HOME
+
+# Download and install StatsD
+# and https://github.com/danslimmon/statsd-opentsdb-backend
+RUN \
+  cd /tmp && \
+  wget --quiet https://github.com/etsy/statsd/archive/master.zip && \
+  unzip master.zip && \
+  rm master.zip && \
+  mv /tmp/statsd-master/* $STATSD_HOME
+  
+RUN \  
+  cd $STATSD_HOME && \
+  npm install statsd-opentsdb-backend && \
+  npm install nodeunit && \
+  npm install
+  
+
+VOLUME ["/local/data"]
+
+# Setup our StatsD config
+RUN \
+  touch $STATSD_CONF && \
+  printf "{\n" >> $STATSD_CONF && \
+  printf "backends: [ './backends/opentsdb' ],\n" >> $STATSD_CONF && \
+  printf " opentsdb: {\n" >> $STATSD_CONF && \
+  printf " opentsdbHost: 'localhost',\n" >> $STATSD_CONF && \
+  printf " opentsdbPort: 4242,\n" >> $STATSD_CONF && \
+  printf " opentsdbTagPrefix: '_t_'\n" >> $STATSD_CONF && \
+  printf "}\n" >> $STATSD_CONF && \  
+  printf "}\n" >> $STATSD_CONF
+
+RUN \
+  cp /local/statsd/node_modules/statsd-opentsdb-backend/statsd-opentsdb-backend/index.js /local/statsd/backends/opentsdb.js
+
+RUN \
+  touch $STATSD_HOME/statsdcheck.sh && \
+  printf "#!/usr/bin/env bash\n" >> $STATSD_HOME/statsdcheck.sh && \
+  printf "/usr/sbin/ss -an|grep -q ':8125'" >> $STATSD_HOME/statsdcheck.sh && \
+  chmod +x $STATSD_HOME/statsdcheck.sh
+
+RUN \
+  touch $STATSD_HOME/statsd.sh && \
+  printf "#!/usr/bin/env bash\n" >> $STATSD_HOME/statsd.sh && \
+  printf "node \$STATSD_HOME/stats.js \$STATSD_CONF\n" >> $STATSD_HOME/statsd.sh && \
+  chmod +x $STATSD_HOME/statsd.sh
+
+CMD ["statsd.sh"]
+
+EXPOSE 8125
+
+# test command
+# echo "gorets._t_foo.bar:261|c" | nc -w 1 -u localhost 8125

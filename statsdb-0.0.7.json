@@ -1,0 +1,75 @@
+{
+   "ID": "",
+   "Name": "statsdb",
+   "Description": "Statsd with OpenTSDB backend",
+   "Services": [
+     {
+       "Name": "Statsd with OpenTSDB backend",
+       "Version": "0.0.7",
+       "Command": "/local/statsd/statsd.sh",
+       "Description": "Statsd with OpenTSDB backend",
+       "Tags":  [
+       	"daemon"
+       ],
+       "ImageID": "aquinn/statsdb:0.7",
+       "Instances": {
+         "Min": 1,
+         "Max": 0
+       },
+       "ChangeOptions": null,
+       "Launch": "auto",
+       "HostPolicy": "",
+       "Hostname": "statsdb",
+       "Privileged": false,
+       "ConfigFiles": {},
+       "Context": null,
+       "Endpoints": [ {
+                       "Name": "statsdb",
+                       "Purpose": "export",
+                       "Protocol": "tcp",
+                       "PortNumber": 8125,
+                       "PortTemplate": "",
+                       "VirtualAddress": "",
+                       "Application": "statsdb",
+                       "ApplicationTemplate": "",
+                       "AddressConfig": {
+                         "Port": 0,
+                         "Protocol": ""
+                       },
+                       "VHosts": null,
+                       "VHostList": null,
+                       "PortList": null
+                     }],
+       "Tasks": null,
+       "LogFilters": null,
+       "Volumes": null,
+       "LogConfigs": null,
+       "Snapshot": {
+         "Pause": "",
+         "Resume": ""
+       },
+       "RAMCommitment": "1G",
+       "CPUCommitment": 2,
+       "Runs": null,
+       "Actions": null,
+       "HealthCheck": {
+            "statsdb_answering": {
+			  "Script": "ss -an|grep -q ':8125'",
+			  "Timeout": 0,
+		       "Interval": 10,
+			  "Tolerance": 0
+            }
+	  },
+       "Prereqs": null,
+       "MonitoringProfile": {
+         "MetricConfigs": null,
+         "GraphConfigs": null,
+         "ThresholdConfigs": null
+       },
+       "MemoryLimit": 0,
+       "CPUShares": 0,
+       "PIDFile": ""
+     }
+   ],
+   "ConfigFiles": null
+ }
