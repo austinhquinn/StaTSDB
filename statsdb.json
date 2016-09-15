@@ -1,0 +1,107 @@
+{
+   "ID": "",
+   "Name": "StaTSDB",
+   "Version": "0.0.8",
+   "Description": "Statsd with OpenTSDB backend - for Zenoss",
+   "Services": [
+     {
+       "Name": "StaTSDB",
+       "Title": "StaTSDB",
+       "Version": "0.0.8",
+       "Command": "/local/statsd/statsd.sh",
+       "Description": "Statsd with OpenTSDB backend - for Zenoss",
+       "Tags": null,
+       "ImageID": "aquinn/statsdb:0.8",
+       "Instances": {
+         "Min": 1,
+         "Max": 1,
+         "Default": 1
+       },
+       "ChangeOptions": null,
+       "Launch": "auto",
+       "HostPolicy": "",
+       "Hostname": "",
+       "Privileged": false,
+       "ConfigFiles": {
+         "/local/statsd/statsdConfig.js": {
+           "Filename": "/local/statsd/statsdConfig.js",
+           "Owner": "statsd:statsd",
+           "Permissions": "777",
+           "Content": "{\n backends: ['./backends/opentsdb'],  opentsdbHost: '172.17.0.13',\n opentsdbPort: 4242,\n opentsdbTagPrefix: '_t_',\n legacyNamespace: false \n }"
+         }
+       },       
+       "Context": null,
+       "Endpoints": [
+         {
+           "Name": "statsdb-udp",
+           "Purpose": "export",
+           "Protocol": "udp",
+           "PortNumber": 8125,
+           "PortTemplate": "",
+           "VirtualAddress": "",
+           "Application": "statsdb",
+           "ApplicationTemplate": "",
+           "AddressConfig": {
+             "Port": 8125,
+             "Protocol": "udp"
+           },
+           "VHosts": null,
+           "VHostList": null,
+           "PortList": null
+         }  
+       ],
+       "Services": [],
+       "Tasks": null,
+       "LogFilters": null,
+       "Volumes":null,
+	  "LogConfigs": [
+	               {
+	                 "Path": "/var/log/statsdb.log",
+	                 "Type": "statsd",
+	                 "Filters": null,
+	                 "LogTags": null
+	               }
+	             ],
+       "Snapshot": {
+         "Pause": "",
+         "Resume": ""
+       },
+       "RAMCommitment": "512M",
+       "CPUCommitment": 2,
+       "Runs": null,
+       "Actions": null,
+       "HealthChecks": {
+           "health": {
+               "Script": "ss -an|grep -q ':8125'",
+               "Interval": 10,
+               "Timeout": 10
+           }
+       },       
+       "Prereqs": null,
+       "MonitoringProfile": {
+         "MetricConfigs": null,
+         "GraphConfigs": null,
+         "ThresholdConfigs": null
+       },
+       "MemoryLimit": 0,
+       "CPUShares": 0,
+       "PIDFile": ""
+     }
+   ],
+   "ConfigFiles": null,
+   "ServicedVersion": {
+     "Version": "1.0.7",
+     "Date": "Sat Oct 24 15:30:13 UTC 2015",
+     "Gitbranch": "HEAD",
+     "Gitcommit": "9141bcd-dirty",
+     "Giturl": "",
+     "Buildtag": "0",
+     "Release": "1.0.7-1"
+   },
+   "TemplateVersion": {
+     "branch": "unknown",
+     "commit": "unknown",
+     "repo": "unknown",
+     "tag": "unknown"
+   }
+}

@@ -44,7 +44,7 @@ RUN \
   mv /tmp/node-v$NODE_VERSION-linux-x64/* $NODE_HOME
 
 # Download and install StatsD
-# and https://github.com/danslimmon/statsd-opentsdb-backend
+# and https://github.com/danslimmon/statsd-opentsdb-backend fork
 RUN \
   cd /tmp && \
   wget --quiet https://github.com/etsy/statsd/archive/master.zip && \
@@ -54,10 +54,10 @@ RUN \
   
 RUN \  
   cd $STATSD_HOME && \
-  npm install statsd-opentsdb-backend && \
+  git clone https://github.com/austinhquinn/statsd-opentsdb-backend.git && \
   npm install nodeunit && \
   npm install
-  
+   
 
 VOLUME ["/local/data"]
 
@@ -74,7 +74,7 @@ RUN \
   printf "}\n" >> $STATSD_CONF
 
 RUN \
-  cp /local/statsd/node_modules/statsd-opentsdb-backend/statsd-opentsdb-backend/index.js /local/statsd/backends/opentsdb.js
+  cp /local/statsd/statsd-opentsdb-backend/statsd-opentsdb-backend/index.js /local/statsd/backends/opentsdb.js
 
 RUN \
   touch $STATSD_HOME/statsdcheck.sh && \
@@ -85,7 +85,7 @@ RUN \
 RUN \
   touch $STATSD_HOME/statsd.sh && \
   printf "#!/usr/bin/env bash\n" >> $STATSD_HOME/statsd.sh && \
-  printf "node \$STATSD_HOME/stats.js \$STATSD_CONF\n" >> $STATSD_HOME/statsd.sh && \
+  printf "node \$STATSD_HOME/stats.js \$STATSD_CONF 2>&1 |tee /var/log/statsdb.log \n" >> $STATSD_HOME/statsd.sh && \
   chmod +x $STATSD_HOME/statsd.sh
 
 CMD ["statsd.sh"]
