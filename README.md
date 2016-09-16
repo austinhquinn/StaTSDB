@@ -8,7 +8,7 @@ Just change the host information as needed before building.
 Clone the git repo to a a directory of your choice. (/usr/src/, /tmp/)
 then run the build command:
 
-docker build -t aquinn/statsdb:0.7 -f ./DockerFile .
+docker build -t aquinn/statsdb:0.8 -f ./DockerFile .
 
 Then use the Zenoss Command Center webui to add the application template 'statsdb.json', then add a new application using the statsdb template.
 You may have to change some of the settings but this initial commit will get you 90+% to a working statsd ingest into opentsdb for zenoss.
