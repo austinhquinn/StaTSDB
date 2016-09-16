@@ -27,7 +27,7 @@
            "Filename": "/local/statsd/statsdConfig.js",
            "Owner": "statsd:statsd",
            "Permissions": "777",
-           "Content": "{\n backends: ['./backends/opentsdb'],  opentsdbHost: '172.17.0.13',\n opentsdbPort: 4242,\n opentsdbTagPrefix: '_t_',\n legacyNamespace: false \n }"
+           "Content": "{\n backends: ['./backends/opentsdb'],\n  opentsdbHost: '172.17.0.13',\n opentsdbPort: 4242,\n opentsdbTagPrefix: '_t_' \n }"
          }
        },       
        "Context": null,
@@ -72,7 +72,7 @@
        "Actions": null,
        "HealthChecks": {
            "health": {
-               "Script": "ss -an|grep -q ':8125'",
+               "Script": "  ps aux |grep -e '[s]tatsd /local/statsd/statsdConfig.js'  -q  ",
                "Interval": 10,
                "Timeout": 10
            }
